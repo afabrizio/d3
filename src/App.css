@@ -1,0 +1,38 @@
+body {
+	margin: 0;
+}
+
+#root {
+	align-items: center;
+	background-color: #EFEFEF;
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	margin: 0;
+	width: 100vw;
+}
+
+#root > .app {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	width: 100%;
+}
+
+#root > .app > .navbar {
+	background-color: #1E1E1E;
+	color: #EFEFEF;
+	display: flex;
+	flex-direction: row;
+	padding: 0 1rem;
+}
+
+
+#root > .app > .main {
+	background-color: #FFF;
+	display: flex;
+	flex: 1;
+	margin: 0 auto;
+	max-width: 1200px;
+	width: 100%;
+}
