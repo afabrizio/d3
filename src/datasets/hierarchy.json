@@ -1,0 +1,18 @@
+[
+	{
+		"id": 1,
+		"label": "CTX",
+		"children": [
+			{
+				"id": 2,
+				"label": "AMC",
+				"children": []
+			},
+			{
+				"id": 3,
+				"label": "HSG",
+				"children": []
+			}
+		]
+	}
+]
