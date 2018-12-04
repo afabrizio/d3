@@ -7,17 +7,39 @@ export default class HierarchySVG extends Component {
 		super(props);
 		this.initialize = this.initialize.bind(this);
 		this.SVG = React.createRef();
+		const radius = 15;
 		this.state = {
-			cx: props.width / 2,
-			cy: props.height / 2,
+			root: {
+				cx: props.width / 2,
+				cy: props.height / 2,
+			};
 			node: {
-				radius: 15,
+				borderColor: '#000',
+				borderWidth: 2,
+				fill: '#0FF',
+				radius,
 			},
+			edge: {
+				strokeColor: '#000',
+				strokeWidth: 2,
+			},
+			offset: {
+				dx: (2 * radius) + 10,
+				dy: (2 * radius) + 30
+			},	
+			nodes: [],
+			edges: []
 		};
 	};
 
 	componentDidUpdate() {
 		this.initialize();
+	};
+
+	computeTree(dataset = []) {
+		let tree = [];
+		const addNode = () => {
+		};
 	};
 
 	initialize() {
@@ -35,7 +57,7 @@ export default class HierarchySVG extends Component {
 		select(this.SVG.current)
 			.append('g')
 			.attr('id', 'circles')
-				.selectAll('circle')
+			.selectAll('circle')
 				// .data()
 				// .enter()
 				// .append('circle')
