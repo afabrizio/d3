@@ -6,7 +6,8 @@
 			{
 				"id": 2,
 				"label": "AMC",
-				"children": []
+				"children": [
+				]
 			},
 			{
 				"id": 3,
@@ -16,7 +17,22 @@
 						"id": 4,
 						"label": "Site #1",
 						"children": []
-					}	
+					},
+					{
+						"id": 4,
+						"label": "Site #1",
+						"children": []
+					},
+					{
+						"id": 4,
+						"label": "Site #1",
+						"children": []
+					},
+					{
+						"id": 4,
+						"label": "Site #1",
+						"children": []
+					}
 				]
 			}
 		]
