@@ -111,6 +111,7 @@ export default class HierarchySVG extends Component {
 			const offsetMultiplier = (numLeaves - 1) / 2;
 			console.log(numLeaves);
 			branch.geometry.cx += (offsetDirection * offsetMultiplier * this.state.offset.dx);
+			branch.children.map( (child) => child.geometry.cx += (offsetDirection * offsetMultiplier * this.state.offset.dx) );
 			branch.children.map( (child) => reposition(child) );
 			return branch;
 		};
