@@ -7,17 +7,33 @@
 				"id": 2,
 				"label": "AMC",
 				"children": [
+					{
+						"id": 4,
+						"label": "Site #1",
+						"children": []
+					}
+				]
+			},
+			{
+				"id": 5,
+				"label": "CBO",
+				"children": [
+					{
+						"id": 6,
+						"label": "IT Department",
+						"children": []
+					},
+					{
+						"id": 6,
+						"label": "IT Department",
+						"children": []
+					}
 				]
 			},
 			{
 				"id": 3,
 				"label": "HSG",
 				"children": [
-					{
-						"id": 4,
-						"label": "Site #1",
-						"children": []
-					},
 					{
 						"id": 4,
 						"label": "Site #1",
