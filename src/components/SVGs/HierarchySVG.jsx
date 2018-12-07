@@ -7,7 +7,7 @@ export default class HierarchySVG extends Component {
 		super(props);
 		this.initialize = this.redraw.bind(this);
 		this.SVG = React.createRef();
-		const radius = 10;
+		const radius = 15;
 		this.state = {
 			root: {
 				cx: props.width / 2,
@@ -16,7 +16,7 @@ export default class HierarchySVG extends Component {
 			node: {
 				borderColor: '#000',
 				borderWidth: 2,
-				fill: '#0FF',
+				fill: '#FFF',
 				radius,
 			},
 			edge: {
@@ -24,15 +24,14 @@ export default class HierarchySVG extends Component {
 				strokeWidth: 2,
 			},
 			offset: {
-				dx: (2 * radius) + (this.props.dx || 5), 
-				dy: (2 * radius) + (this.props.dy || 15) 
+				dx: (2 * radius) + (this.props.dx || 0), 
+				dy: (2 * radius) + (this.props.dy || 30) 
 			},	
 		};
 	};
 
 	componentDidMount() {
 		const trees = this.computeTrees(this.props.dataset);
-		console.log(trees);
 		this.redraw(trees[0]);
 	};
 
@@ -96,30 +95,58 @@ export default class HierarchySVG extends Component {
 				return 1;
 			}
 		};
-		const offset = (d0 = 0, branch) => {
-			const iCenter = (branch.degree - 1) / 2;
-			const offsetDirection = branch.geometry.pos;
-			const offsetMultiplier = branch.children.reduce( (multiplier, child, i) => multiplier + Math.abs(i - iCenter), 0);
-			branch.geometry.dx += (offsetDirection * offsetMultiplier * this.state.offset.dx);
-			branch.geometry.cx += d0 + branch.geometry.dx; 
-			branch.children = branch.children.map( (child) => offset(branch.geometry.dx, child) );
-			return branch;
-		};
+		// repositioning needed due to sibling node geometries:
 		const reposition = (branch) => {
-			const numLeaves = leafCount(branch);
-			const offsetDirection = branch.geometry.pos;
-			const offsetMultiplier = (numLeaves - 1) / 2;
-			console.log(numLeaves);
-			branch.geometry.cx += (offsetDirection * offsetMultiplier * this.state.offset.dx);
-			branch.children.map( (child) => child.geometry.cx += (offsetDirection * offsetMultiplier * this.state.offset.dx) );
+			// repositions children according tp parents total offset thus far:
+			branch.children.map( (child) => child.geometry.cx += branch.geometry.dx);
+			// calculates spacing required for each branch child:
+			const offsets = branch.children
+				.map( (child, i) => {
+					const adjustment = ((leafCount(child) - 1) * this.state.offset.dx) / (i === 0 || i === (branch.degree - 1) ? 2 : 1);
+					if (child.geometry.pos === -1) {
+						return {
+							left: adjustment,
+							right: 0,
+						};
+					} else if (child.geometry.pos === 0) {
+						// NOT ALWAYS EVENLY DISTRIBUTED THOUGH!!
+						return {
+							left: adjustment / 2,
+							right: adjustment / 2,
+						};
+						leafPath = (branch) => branch.reduce( (lr, child) => {
+						}, [0, 0]);
+						const distribution = (branch) => reduce( (children) => )
+						const childLeafCount = child.children.map( (child) => leafCount(child) );
+						console.log(childLeafCount);
+					} else if (child.geometry.pos === 1) {
+						return {
+							left: 0,
+							right: adjustment
+						};
+					}
+				} );
+			// offsets the branch children according to their sibling space requirements: 
+			branch.children.map( (child, i) => {
+				if (child.geometry.pos === -1) {
+					const adjustment = offsets.reduce( (adjustment, { left }) => adjustment += left, 0);
+					child.geometry.dx = branch.geometry.dx - adjustment;
+					child.geometry.cx -= adjustment; 
+				} else if (child.geometry.pos === 0) {
+					child.geometry.dx = branch.geometry.dx;
+				} else if (child.geometry.pos === 1) {
+					const adjustment = offsets.reduce( (adjustment, { right }) => adjustment += right, 0);
+					child.geometry.dx = branch.geometry.dx + adjustment;
+					child.geometry.cx += adjustment; 
+				}
+			} );
+			// recursion:
 			branch.children.map( (child) => reposition(child) );
 			return branch;
 		};
 		return dataset
 			.map( (root) => adopt(null, root, 0) ) 
-		// .map( (tree) => offset(0, tree) );
 			.map( (tree) => reposition(tree) );
-
 	};
 
 	redraw(root) {
@@ -149,14 +176,16 @@ export default class HierarchySVG extends Component {
 			//.duration(500)
 			.enter()
 			.append('line')
-				.attr('x1', ({ x1 }) => x1)
-				.attr('y1', ({ y1 }) => y1)
-				.attr('x2', ({ x2 }) => x2)
-				.attr('y2', ({ y2 }) => y2)
-				.attr('stroke-width', this.state.edge.strokeWidth)
-				.attr('stroke', this.state.edge.strokeColor);
+			.merge(edges)
+			.attr('x1', ({ x1 }) => x1)
+			.attr('y1', ({ y1 }) => y1)
+			.attr('x2', ({ x2 }) => x2)
+			.attr('y2', ({ y2 }) => y2)
+			.attr('stroke-width', this.state.edge.strokeWidth)
+			.attr('stroke', this.state.edge.strokeColor);
 		edges
-			.exit();
+			.exit()
+			.remove();
 		const nodes = select(this.SVG.current)
 			.append('g')
 			.attr('id', 'circles')
@@ -167,6 +196,7 @@ export default class HierarchySVG extends Component {
 		//	.duration(500)
 			.enter()
 			.append('circle')
+			.merge(nodes)
 			.attr('cx', ({ cx }) => cx)
 			.attr('cy', ({ cy }) => cy)
 			.attr('r', ({ r }) => r)
@@ -175,7 +205,8 @@ export default class HierarchySVG extends Component {
 			.style('strokeWidth', this.state.node.borderWidth)
 			.on('click', (d) => console.log(d));
 		nodes
-			.exit();
+			.exit()
+			.remove();
 	};
 
 	render() {

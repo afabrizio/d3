@@ -11,7 +11,7 @@ export default class Main extends Component {
 	render() {
 		return (
 			<div className='main'>
-				<HierarchySVG dataset={dataset} height='400' width='400'></HierarchySVG>
+				<HierarchySVG dataset={dataset} height='600' width='800'></HierarchySVG>
 			</div>
 		);
 	};
