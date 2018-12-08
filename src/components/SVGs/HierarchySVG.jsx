@@ -32,6 +32,7 @@ export default class HierarchySVG extends Component {
 
 	componentDidMount() {
 		const trees = this.computeTrees(this.props.dataset);
+		console.log(trees);
 		this.redraw(trees[0]);
 	};
 
@@ -60,11 +61,14 @@ export default class HierarchySVG extends Component {
 						dx: 0,
 						pos: offsetDirection,
 						r: this.state.node.radius
-					}
+					},
+					rank: i,
+					width: parent.degree
 				};
 				node.children = child.children.map( (child, i) => adopt(node, child, i) );
 				return node;
-			} else {
+			}
+			else {
 				const root = {
 					children: child.children, 
 					degree: child.children.length, 
@@ -81,17 +85,19 @@ export default class HierarchySVG extends Component {
 						r: this.state.node.radius
 					}
 				};
-				root.children = child.children.map( (child, i) => adopt(root, child, i) );
+				root.children = child.children
+					.map( (child, i) => adopt(root, child, i) );
 				return root;
 			}
 			
 		};
 		const leafCount = (branch) => {
-			if(branch.children.length) {
+			if (branch.children.length) {
 				return branch.children
 					.map(leafCount)
-					.reduce( (a, b) => a + b );
-			} else {
+					.reduce( (a, b) => a + b, 0 );
+			}
+			else {
 				return 1;
 			}
 		};
@@ -99,42 +105,99 @@ export default class HierarchySVG extends Component {
 		const reposition = (branch) => {
 			// repositions children according tp parents total offset thus far:
 			branch.children.map( (child) => child.geometry.cx += branch.geometry.dx);
-			// calculates spacing required for each branch child:
+			const distribution = (branch) => {
+				// calculates spacing required for each branch child:
+				// each branch will have a Left - Right distribution that is not always balanced
+				// therefore, each branch must calculate its distribution
+				// check one level at a time, using recursion, decend until hit leaf
+				if (branch.children.length) {
+					return branch.children
+						.map(distribution)
+						.reduce( ({ L, R }, d) => {
+							return { L: L += d.L, R: R += d.R };
+						}, { L: 0, R: 0 } );
+				}
+				else {
+					return { L: 0.5, R: 0.5 };
+				}
+			};
 			const offsets = branch.children
 				.map( (child, i) => {
-					const adjustment = ((leafCount(child) - 1) * this.state.offset.dx) / (i === 0 || i === (branch.degree - 1) ? 2 : 1);
 					if (child.geometry.pos === -1) {
+						const adjustment = ((leafCount(child) - 1) * this.state.offset.dx) / (i === 0 ? 2 : 1);
 						return {
 							left: adjustment,
 							right: 0,
 						};
-					} else if (child.geometry.pos === 0) {
-						// NOT ALWAYS EVENLY DISTRIBUTED THOUGH!!
+					}
+					else if (child.geometry.pos === 0) {
+						// TODO: NOT ALWAYS EVENLY DISTRIBUTED THOUGH!!
+						const pathsToLeaf = (paths, branch) => {
+							// update path offset:
+							if (paths.length) {
+								// if new path to leaf, sets path p0 to branch p0:
+								if (paths[paths.length - 1] === null) {
+									paths[paths.length - 1] = branch.p0;
+								}
+								// TODO: remember to get how far left or how far right by looking at distance from center
+								if (branch.geometry.pos === -1) {
+									paths[paths.length - 1] -= 1;
+								}
+								else if (branch.geometry.pos === 1) {
+									paths[paths.length - 1] += 1;
+								}
+							}
+							else {
+								paths.push(0);
+							}
+							// sets p0 for the children:
+							branch.children.map( (child) => child.p0 = paths[paths.length - 1] );
+							// checks if branch is a leaf:
+							if (branch.children.length) {
+								branch.children
+									.map( (child) => {
+										return pathsToLeaf(paths, child);
+									} );
+								return paths;
+							}
+							else {
+								paths.push(null);
+								return paths;
+							}
+						};
+						child.p0 = 0; // p0 = initial offset
+						const p2l = pathsToLeaf([], child).slice(0, -1);
+						const dist = { L: Math.abs(Math.min(...p2l)), R: Math.max(...p2l) };
+						console.log(p2l, dist);
+						const distribution = { left: dist.L * this.state.offset.dx, right: dist.R * this.state.offset.dx };
+						return distribution; 
+
+						const adjustment = ((leafCount(child) - 1) * this.state.offset.dx) / (i === 0 || i === (branch.degree - 1) ? 2 : 1);
 						return {
 							left: adjustment / 2,
 							right: adjustment / 2,
 						};
-						leafPath = (branch) => branch.reduce( (lr, child) => {
-						}, [0, 0]);
-						const distribution = (branch) => reduce( (children) => )
-						const childLeafCount = child.children.map( (child) => leafCount(child) );
-						console.log(childLeafCount);
-					} else if (child.geometry.pos === 1) {
+					}
+					else if (child.geometry.pos === 1) {
+						const adjustment = ((leafCount(child) - 1) * this.state.offset.dx) / (i === (branch.degree - 1) ? 2 : 1);
 						return {
 							left: 0,
 							right: adjustment
 						};
 					}
 				} );
+			console.log(offsets);
 			// offsets the branch children according to their sibling space requirements: 
 			branch.children.map( (child, i) => {
 				if (child.geometry.pos === -1) {
 					const adjustment = offsets.reduce( (adjustment, { left }) => adjustment += left, 0);
 					child.geometry.dx = branch.geometry.dx - adjustment;
 					child.geometry.cx -= adjustment; 
-				} else if (child.geometry.pos === 0) {
+				}
+				else if (child.geometry.pos === 0) {
 					child.geometry.dx = branch.geometry.dx;
-				} else if (child.geometry.pos === 1) {
+				}
+				else if (child.geometry.pos === 1) {
 					const adjustment = offsets.reduce( (adjustment, { right }) => adjustment += right, 0);
 					child.geometry.dx = branch.geometry.dx + adjustment;
 					child.geometry.cx += adjustment; 
@@ -146,10 +209,10 @@ export default class HierarchySVG extends Component {
 		};
 		return dataset
 			.map( (root) => adopt(null, root, 0) ) 
-			.map( (tree) => reposition(tree) );
+		//.map( (tree) => reposition(tree) );
 	};
 
-	redraw(root) {
+	redraw(root){
 		const extractElements = (branch, elements = { circles: [], lines: [], labels: [] }) => {
 			// circles:
 			elements.circles.push(branch.geometry);
