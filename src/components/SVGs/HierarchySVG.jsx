@@ -24,7 +24,7 @@ export default class HierarchySVG extends Component {
 				strokeWidth: 2,
 			},
 			offset: {
-				dx: (2 * radius) + (this.props.dx || 10), 
+				dx: (2 * radius) + (this.props.dx || 0), 
 				dy: (2 * radius) + (this.props.dy || 30) 
 			},	
 		};
@@ -154,7 +154,7 @@ export default class HierarchySVG extends Component {
 					const offset1 = distributions[i].R;
 					const offset2 = branch.children
 						.reduce( (indicies, { rank, geometry }, i) => {
-							if (rank > i && geometry.pos === -1 ) {
+							if ((rank > child.rank) && (geometry.pos === -1)) {
 								indicies.push(i);
 							}
 							return indicies;
@@ -162,7 +162,7 @@ export default class HierarchySVG extends Component {
 						.reduce( (offset, i) => offset += (distributions[i].L + distributions[i].R), 0);
 					const offset3 = branch.children
 						.reduce( (indicies, { rank, geometry }, i) => {
-							if (geometry.pos === 0 ) {
+							if (geometry.pos === 0) {
 								indicies.push(i);
 							}
 							return indicies;
@@ -176,7 +176,7 @@ export default class HierarchySVG extends Component {
 					const offset1 = distributions[i].L;
 					const offset2 = branch.children
 						.reduce( (indicies, { rank, geometry }, i) => {
-							if (rank < i && geometry.pos === 1 ) {
+							if ((rank < child.rank) && (geometry.pos === 1)) {
 								indicies.push(i);
 							}
 							return indicies;
