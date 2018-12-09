@@ -4,39 +4,66 @@
 		"label": "CTX",
 		"children": [
 			{
+				"id": 0,
+				"label": "AMC",
+				"children": [
+					{
+						"id": 5,
+						"label": "CBO",
+						"children": [
+							{
+								"id": 5,
+								"label": "CBO",
+								"children": [
+								]
+							},
+							{
+								"id": 5,
+								"label": "CBO",
+								"children": [
+								]
+							},
+							{
+								"id": 5,
+								"label": "CBO",
+								"children": [
+								]
+							}
+						]
+					}
+				]
+			},
+			{
 				"id": 5,
 				"label": "CBO",
 				"children": [
 					{
-						"id": 6,
-						"label": "IT Department",
-						"children": []
+						"id": 5,
+						"label": "CBO",
+						"children": [
+						]
 					},
 					{
-						"id": 4,
-						"label": "Site #1",
+						"id": 5,
+						"label": "CBO",
 						"children": [
 							{
-								"id": 6,
-								"label": "IT Department",
-
+								"id": 5,
+								"label": "CBO",
 								"children": [
-									{
-										"id": 6,
-										"label": "IT Department",
-										"children": []
-									},
-									{
-										"id": 6,
-										"label": "IT Department",
-										"children": []
-									}
 								]
 							},
 							{
-								"id": 6,
-								"label": "IT Department",
-								"children": []
+								"id": 5,
+								"label": "CBO",
+								"children": [
+								]
+							},
+							{
+								"id": 5,
+								"label": "CBO",
+								"children": [
+								]
 							}
 						]
 					}
@@ -45,7 +72,26 @@
 			{
 				"id": 3,
 				"label": "HSG",
-				"children": []
+				"children": [
+					{
+						"id": 5,
+						"label": "CBO",
+						"children": [
+						]
+					},
+					{
+						"id": 5,
+						"label": "CBO",
+						"children": [
+						]
+					},
+					{
+						"id": 5,
+						"label": "CBO",
+						"children": [
+						]
+					}
+				]
 			}
 		]
 	}
