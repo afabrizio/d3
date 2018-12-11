@@ -1,0 +1,57 @@
+[
+	{
+		"_id" : "5c0ec804b4ecdbee0734a799",
+		"label" : "Cytellix",
+		"parents" : [ ],
+		"supplyChain" : [
+			{
+				"_id" : "5c0ec8d4b4ecdbee0734a79f",
+				"label" : "Canada",
+				"parents" : [
+					"5c0ec873b4ecdbee0734a79b"
+				],
+				"depth" : 1
+			},
+			{
+				"_id" : "5c0ec8d4b4ecdbee0734a79e",
+				"label" : "United Kingdom",
+				"parents" : [
+					"5c0ec873b4ecdbee0734a79b"
+				],
+				"depth" : 1
+			},
+			{
+				"_id" : "5c0ec873b4ecdbee0734a79a",
+				"label" : "AMC",
+				"parents" : [
+					"5c0ec804b4ecdbee0734a799"
+				],
+				"depth" : 0
+			},
+			{
+				"_id" : "5c0ec8d4b4ecdbee0734a79d",
+				"label" : "United States",
+				"parents" : [
+					"5c0ec873b4ecdbee0734a79b"
+				],
+				"depth" : 1
+			},
+			{
+				"_id" : "5c0ec873b4ecdbee0734a79b",
+				"label" : "HSG",
+				"parents" : [
+					"5c0ec804b4ecdbee0734a799"
+				],
+				"depth" : 0
+			},
+			{
+				"_id" : "5c0ec873b4ecdbee0734a79c",
+				"label" : "CBO",
+				"parents" : [
+					"5c0ec804b4ecdbee0734a799"
+				],
+				"depth" : 0
+			}
+		]
+	}
+]

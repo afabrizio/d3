@@ -24,7 +24,7 @@ export default class HierarchySVG extends Component {
 				strokeWidth: 2,
 			},
 			offset: {
-				dx: (2 * radius) + (this.props.dx || 0), 
+				dx: (2 * radius) + (this.props.dx || 10), 
 				dy: (2 * radius) + (this.props.dy || 30) 
 			},	
 		};
@@ -202,7 +202,7 @@ export default class HierarchySVG extends Component {
 			.map( (tree) => reposition(tree) );
 	};
 
-	redraw(root){
+	redraw(root) {
 		const extractElements = (branch, elements = { circles: [], lines: [], labels: [] }) => {
 			// circles:
 			elements.circles.push(branch.geometry);
