@@ -1,36 +1,75 @@
 //bl.ocks.org/NPashaP/7683252
+//https://bl.ocks.org/kerryrodden/7090426
 import React, { Component } from 'react';
-import { select, selection } from 'd3-selection';
+import { drag } from 'd3-drag';
+import { easeCubicOut } from 'd3-ease';
+import { event, select, selection } from 'd3-selection';
+import { zoom } from 'd3-zoom';
 
 export default class HierarchySVG extends Component {
 	constructor(props) {
 		super(props);
-		this.initialize = this.redraw.bind(this);
-		this.SVG = React.createRef();
-		const radius = 15;
+		this.initialize = this.initialize.bind(this);
+		this.redraw = this.redraw.bind(this);
+		this.tree = React.createRef();
+		this.pan = React.createRef();
+		const margin = {
+			bottom: 50,
+			left: 50,
+			right: 50,
+			top: 50
+		};
+		const radius = 20;
+		this.SVG = {
+			breadcrumbs: {
+			},
+			header: {
+			},
+			legend: {
+			},
+			margin,
+			tree: {
+				container: {
+					height: props.height - (margin.top + margin.bottom),
+					width: props.width - (margin.left + margin.right)
+				},
+				root: {
+					cx: (props.width - (margin.left + margin.right)) / 2,
+					cy: radius + 2
+				},
+				node: {
+					borderColor: '#E50914',
+					borderWidth: 2,
+					fill: '#00C4F2',
+					radius,
+				},
+				edge: {
+					strokeColor: '#E50914',
+					strokeWidth: 2,
+				},
+				offset: {
+					dx: (2 * radius) + (props.dx || 10), 
+					dy: (2 * radius) + (props.dy || 30) 
+				},
+				zoom: {
+					duration: 500,
+					ease: easeCubicOut,
+					level: 5
+				}
+			},
+		};
 		this.state = {
-			root: {
-				cx: props.width / 2,
-				cy: 20
+			pan: {
+				x: 0,
+				y: 0
 			},
-			node: {
-				borderColor: '#000',
-				borderWidth: 2,
-				fill: '#FFF',
-				radius,
-			},
-			edge: {
-				strokeColor: '#000',
-				strokeWidth: 2,
-			},
-			offset: {
-				dx: (2 * radius) + (this.props.dx || 10), 
-				dy: (2 * radius) + (this.props.dy || 30) 
-			},	
+			zoom: {
+			}
 		};
 	};
 
 	componentDidMount() {
+		this.initialize();
 		const trees = this.computeTrees(this.props.dataset);
 		console.log(trees);
 		this.redraw(trees[0]);
@@ -53,12 +92,12 @@ export default class HierarchySVG extends Component {
 					depth: parent.depth + 1,
 					edges: [],
 					geometry: {
-						// cx: parent.geometry.cx + (offsetDirection * offsetMultiplier * this.state.offset.dx),
+						// cx: parent.geometry.cx + (offsetDirection * offsetMultiplier * this.SVG.treee.offset.dx),
 						cx: 0, 
-						cy: parent.geometry.cy + this.state.offset.dy,
+						cy: parent.geometry.cy + this.SVG.tree.offset.dy,
 						dx: 0,
 						pos: offsetDirection,
-						r: this.state.node.radius
+						r: this.SVG.tree.node.radius
 					},
 					id: child.id,
 					label: child.label,
@@ -77,10 +116,10 @@ export default class HierarchySVG extends Component {
 					depth: 0,
 					edges: [],
 					geometry: {
-						cx: this.state.root.cx,
-						cy: this.state.root.cy,
+						cx: this.SVG.tree.root.cx,
+						cy: this.SVG.tree.root.cy,
 						pos: 0,
-						r: this.state.node.radius
+						r: this.SVG.tree.node.radius
 					},
 					id: child.id,
 					label: child.label,
@@ -168,7 +207,7 @@ export default class HierarchySVG extends Component {
 							return indicies;
 						}, [])
 						.reduce( (offset, i) => offset += distributions[i].L, 0);
-					child.geometry.cx -= ((offset1 + offset2 + offset3) * this.state.offset.dx); 
+					child.geometry.cx -= ((offset1 + offset2 + offset3) * this.SVG.tree.offset.dx); 
 				}
 				else if (child.geometry.pos === 0) {
 				}
@@ -190,7 +229,7 @@ export default class HierarchySVG extends Component {
 							return indicies;
 						}, [])
 						.reduce( (offset, i) => offset += distributions[i].R, 0);
-					child.geometry.cx += ((offset1 + offset2 + offset3) * this.state.offset.dx); 
+					child.geometry.cx += ((offset1 + offset2 + offset3) * this.SVG.tree.offset.dx); 
 				}
 			} );
 			// recursion:
@@ -200,6 +239,20 @@ export default class HierarchySVG extends Component {
 		return dataset
 			.map( (root) => adopt(null, root, 0) ) 
 			.map( (tree) => reposition(tree) );
+	};
+
+	initialize() {
+		select(this.pan.current).call(
+			drag().on('drag', () => {
+				const { dx, dy, x, y } = event;
+				console.log(dx, dy, x, y);
+				//select(this.tree.current)
+				//	.selectAll('g')
+				//	.call(zoom.translateBy, dx, dy);
+			} )
+		);
+		select(this.tree.current)
+			.attr('transform', `translate(${this.SVG.margin.left}, ${this.SVG.margin.top})`);
 	};
 
 	redraw(root) {
@@ -219,7 +272,7 @@ export default class HierarchySVG extends Component {
 			return elements;
 		};
 		const { circles, lines } = extractElements(root);
-		let edges = select(this.SVG.current)
+		let edges = select(this.tree.current)
 			.append('g')
 			.attr('id', 'lines')
 			.selectAll('line')
@@ -234,28 +287,28 @@ export default class HierarchySVG extends Component {
 			.attr('y1', ({ y1 }) => y1)
 			.attr('x2', ({ x2 }) => x2)
 			.attr('y2', ({ y2 }) => y2)
-			.attr('stroke-width', this.state.edge.strokeWidth)
-			.attr('stroke', this.state.edge.strokeColor);
+			.attr('stroke-width', this.SVG.tree.edge.strokeWidth)
+			.attr('stroke', this.SVG.tree.edge.strokeColor);
 		edges
 			.exit()
 			.remove();
-		const nodes = select(this.SVG.current)
+		const nodes = select(this.tree.current)
 			.append('g')
 			.attr('id', 'circles')
 			.selectAll('circle')
 				.data(circles);
 		nodes
-		// .transition()
-		//	.duration(500)
+		//.transition()
+		//.duration(500)
 			.enter()
 			.append('circle')
 			.merge(nodes)
 			.attr('cx', ({ cx }) => cx)
 			.attr('cy', ({ cy }) => cy)
 			.attr('r', ({ r }) => r)
-			.style('fill', this.state.node.fill)
-			.style('stroke', this.state.node.borderColor)
-			.style('strokeWidth', this.state.node.borderWidth)
+			.style('fill', this.SVG.tree.node.fill)
+			.style('stroke', this.SVG.tree.node.borderColor)
+			.style('strokeWidth', this.SVG.tree.node.borderWidth)
 			.on('click', (d) => console.log(d));
 		nodes
 			.exit()
@@ -263,8 +316,25 @@ export default class HierarchySVG extends Component {
 	};
 
 	render() {
+		const styles = {
+			SVG: {
+				backgroundColor: '#FFF',
+				border: 'solid 1px #272B2E'
+			},
+			tree: {
+				fill: '272B2E'
+			}
+		};
 		return (
-			<svg id="tree" ref={this.SVG} height={this.props.height} width={this.props.width}>
+			<svg height={this.props.height} width={this.props.width} style={styles.SVG}>
+				<defs>
+					<clipPath id="tree-container">
+						<rect x="0" y="0" height={this.SVG.tree.container.height} width={this.SVG.tree.container.width} />
+					</clipPath>
+				</defs>
+				<g ref={this.tree} clipPath="url(#tree-container)">
+					<rect ref={this.pan} x="0" y="0" height={this.SVG.tree.container.height} width={this.SVG.tree.container.width} style={styles.tree} />
+				</g> 
 			</svg>
 		);
 	};
