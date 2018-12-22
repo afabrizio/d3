@@ -1,10 +1,12 @@
-//bl.ocks.org/NPashaP/7683252
+//https://bl.ocks.org/NPashaP/7683252
+//https://bl.ocks.org/mbostock/6123708
 //https://bl.ocks.org/kerryrodden/7090426
+//https://bl.ocks.org/mbostock/4e3925cdc804db257a86fdef3a032a45
 import React, { Component } from 'react';
 import { drag } from 'd3-drag';
 import { easeCubicOut } from 'd3-ease';
 import { event, select, selection } from 'd3-selection';
-import { zoom } from 'd3-zoom';
+import { zoom, zoomIdentity } from 'd3-zoom';
 
 export default class HierarchySVG extends Component {
 	constructor(props) {
@@ -12,7 +14,6 @@ export default class HierarchySVG extends Component {
 		this.initialize = this.initialize.bind(this);
 		this.redraw = this.redraw.bind(this);
 		this.tree = React.createRef();
-		this.pan = React.createRef();
 		const margin = {
 			bottom: 50,
 			left: 50,
@@ -38,18 +39,18 @@ export default class HierarchySVG extends Component {
 					cy: radius + 2
 				},
 				node: {
-					borderColor: '#E50914',
+					borderColor: '#FFF',
 					borderWidth: 2,
-					fill: '#00C4F2',
+					fill: '#CCC',
 					radius,
 				},
 				edge: {
-					strokeColor: '#E50914',
+					strokeColor: '#FFF',
 					strokeWidth: 2,
 				},
 				offset: {
 					dx: (2 * radius) + (props.dx || 10), 
-					dy: (2 * radius) + (props.dy || 30) 
+					dy: (2 * radius) + (props.dy || 50) 
 				},
 				zoom: {
 					duration: 500,
@@ -59,12 +60,6 @@ export default class HierarchySVG extends Component {
 			},
 		};
 		this.state = {
-			pan: {
-				x: 0,
-				y: 0
-			},
-			zoom: {
-			}
 		};
 	};
 
@@ -242,17 +237,24 @@ export default class HierarchySVG extends Component {
 	};
 
 	initialize() {
-		select(this.pan.current).call(
-			drag().on('drag', () => {
-				const { dx, dy, x, y } = event;
-				console.log(dx, dy, x, y);
-				//select(this.tree.current)
-				//	.selectAll('g')
-				//	.call(zoom.translateBy, dx, dy);
-			} )
-		);
-		select(this.tree.current)
-			.attr('transform', `translate(${this.SVG.margin.left}, ${this.SVG.margin.top})`);
+		const treeContainer = select(this.tree.current);
+		treeContainer.attr('transform', `translate(${this.SVG.margin.left}, ${this.SVG.margin.top})`);
+		const panner = treeContainer
+			.append('rect')
+				.attr('id', 'panner')
+				.attr('height', this.SVG.tree.container.height)
+				.attr('width', this.SVG.tree.container.width)
+				.attr('fill', '#272B2E')
+				.attr('pointer-events', 'all')
+				.call(zoom()
+					.scaleExtent([0.5, 2])
+					.on('zoom', () => {
+						const { transform } = event;
+						treeContainer.selectAll('g')
+							.attr('transform', transform);
+					})
+				);
+		//const treeZoomBehavior = select(treeRef).selectAll('g').call(zoom().translateBy(2, 2));
 	};
 
 	redraw(root) {
@@ -321,9 +323,6 @@ export default class HierarchySVG extends Component {
 				backgroundColor: '#FFF',
 				border: 'solid 1px #272B2E'
 			},
-			tree: {
-				fill: '272B2E'
-			}
 		};
 		return (
 			<svg height={this.props.height} width={this.props.width} style={styles.SVG}>
@@ -332,9 +331,7 @@ export default class HierarchySVG extends Component {
 						<rect x="0" y="0" height={this.SVG.tree.container.height} width={this.SVG.tree.container.width} />
 					</clipPath>
 				</defs>
-				<g ref={this.tree} clipPath="url(#tree-container)">
-					<rect ref={this.pan} x="0" y="0" height={this.SVG.tree.container.height} width={this.SVG.tree.container.width} style={styles.tree} />
-				</g> 
+				<g ref={this.tree} clipPath="url(#tree-container)"></g> 
 			</svg>
 		);
 	};
