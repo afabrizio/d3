@@ -4,126 +4,95 @@
 		"label": "CTX",
 		"children": [
 			{
-				"id": 0,
+				"id": 2,
 				"label": "AMC",
 				"children": [
 					{
 						"id": 5,
-						"label": "CBO",
-						"children": [
-							{
-								"id": 5,
-								"label": "CBO",
-								"children": [
-								]
-							},
-							{
-								"id": 5,
-								"label": "CBO",
-								"children": [
-								]
-							},
-							{
-								"id": 5,
-								"label": "CBO",
-								"children": [
-									{
-										"id": 5,
-										"label": "CBO",
-										"children": [
-										]
-									},
-									{
-										"id": 5,
-										"label": "CBO",
-										"children": [
-										]
-									},
-									{
-										"id": 5,
-										"label": "CBO",
-										"children": [
-										]
-									},
-									{
-										"id": 5,
-										"label": "CBO",
-										"children": [
-										]
-									},
-									{
-										"id": 5,
-										"label": "CBO",
-										"children": [
-										]
-									},
-									{
-										"id": 5,
-										"label": "CBO",
-										"children": [
-										]
-									}
-								]
-							}
-						]
-					}
-				]
-			},
-			{
-				"id": 5,
-				"label": "CBO",
-				"children": [
-					{
-						"id": 5,
-						"label": "CBO",
-						"children": [
-						]
+						"label": "AMSAA",
+						"children": []
 					},
 					{
-						"id": 5,
-						"label": "CBO",
-						"children": [
-							{
-								"id": 5,
-								"label": "CBO",
-								"children": [
-								]
-							},
-							{
-								"id": 5,
-								"label": "CBO",
-								"children": [
-								]
-							},
-							{
-								"id": 5,
-								"label": "CBO",
-								"children": [
-								]
-							}
-						]
+						"id": 6,
+						"label": "CMA",
+						"children": []
+					},
+					{
+						"id": 7,
+						"label": "LOGSA",
+						"children": []
+					},
+					{
+						"id": 8,
+						"label": "ACC",
+						"children": []
+					},
+					{
+						"id": 9,
+						"label": "AMCOM",
+						"children": []
+					},
+					{
+						"id": 10,
+						"label": "ASC",
+						"children": []
+					},
+					{
+						"id": 11,
+						"label": "CECOM",
+						"children": []
+					},
+					{
+						"id": 12,
+						"label": "JMC/JM&L",
+						"children": []
+					},
+					{
+						"id": 13,
+						"label": "RDECOM",
+						"children": []
+					},
+					{
+						"id": 14,
+						"label": "SDDC",
+						"children": []
+					},
+					{
+						"id": 15,
+						"label": "TACOM",
+						"children": []
+					},
+					{
+						"id": 16,
+						"label": "USASAC",
+						"children": []
 					}
 				]
 			},
 			{
 				"id": 3,
+				"label": "CBO",
+				"children": []
+			},
+			{
+				"id": 4,
 				"label": "HSG",
 				"children": [
 					{
 						"id": 5,
-						"label": "CBO",
+						"label": "USA",
 						"children": [
 						]
 					},
 					{
 						"id": 5,
-						"label": "CBO",
+						"label": "CAN",
 						"children": [
 						]
 					},
 					{
 						"id": 5,
-						"label": "CBO",
+						"label": "LON",
 						"children": [
 						]
 					}
