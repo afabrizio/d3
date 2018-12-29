@@ -42,17 +42,17 @@ export default class ZoomControlSVG extends Component {
 		const styles = {
 			button: {
 				'cursor': 'pointer',
-				'opacity': 0.3
+				'fill': '#FFF',
+				'opacity': 0.9
 			},
 			path: {
-				'opacity': 0.75,
 				'pointerEvents': 'none'
 			}
 		};
 		const zoom_in = <path style={styles.path} d={d_in} stroke="#000" strokeWidth={1} fill="transparent" />;
 		const zoom_out = <path style={styles.path} d={d_out} stroke="#000" strokeWidth={1} fill="transparent" />;
 		return (
-			<svg id="zoom_control" >
+			<svg id="zoom_control" height={2 * control + 3 * margin} width={control + 2 * margin}>
 				<g id="controls" transform={'translate(' + margin  + ' ' + margin + ')'}>
 					<g id="in">
 						<rect style={styles.button} height={control} width={control} onClick={() => this.props.zoomControlHandler(5)} />

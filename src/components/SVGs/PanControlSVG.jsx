@@ -44,11 +44,11 @@ export default class PanControlSVG extends Component {
 		  .join(' ');
 		const styles = {
 			button: {
+				'fill': '#FFF',
 				'cursor': 'pointer',
-				'opacity': 0.3
+				'opacity': 0.9
 			},
 			path: {
-				'opacity': 0.75,
 				'pointerEvents': 'none'
 			}
 		};

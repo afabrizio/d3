@@ -15,9 +15,7 @@ body {
 }
 
 #root > .app {
-	display: flex;
-	flex: 1;
-	flex-direction: column;
+	overflow-y: scroll;
 	width: 100%;
 }
 
@@ -31,9 +29,11 @@ body {
 
 
 #root > .app > .main {
+	align-items: center;
 	background-color: #FFF;
 	display: flex;
 	flex: 1;
+	flex-direction: column;
 	margin: 0 auto;
 	max-width: 1200px;
 	width: 100%;

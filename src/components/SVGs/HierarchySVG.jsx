@@ -9,6 +9,10 @@ import { event, select, selection } from 'd3-selection';
 import { transition } from 'd3-transition';
 import { zoom, zoomIdentity } from 'd3-zoom';
 
+import BreadcrumbsSVG from './BreadcrumbsSVG.jsx';
+import PanControlSVG from './PanControlSVG.jsx';
+import ZoomControlSVG from './ZoomControlSVG.jsx';
+
 export default class HierarchySVG extends Component {
 	constructor(props) {
 		super(props);
@@ -17,19 +21,13 @@ export default class HierarchySVG extends Component {
 		this.redraw = this.redraw.bind(this);
 		this.tree = React.createRef();
 		const margin = {
-			bottom: 50,
-			left: 50,
-			right: 50,
+			bottom: 0,
+			left: 0,
+			right: 0,
 			top: 50
 		};
 		const radius = 20;
 		this.SVG = {
-			breadcrumbs: {
-			},
-			header: {
-			},
-			legend: {
-			},
 			margin,
 			tree: {
 				container: {
@@ -63,6 +61,7 @@ export default class HierarchySVG extends Component {
 			}
 		};
 		this.state = {
+			breadcrumbs: [],
 		};
 	};
 
@@ -70,11 +69,6 @@ export default class HierarchySVG extends Component {
 		this.initialize();
 		const trees = this.computeTrees(this.props.dataset);
 		console.log(trees);
-		this.redraw(trees[0]);
-	};
-
-	componentDidUpdate() {
-		const trees = this.computeTrees(this.props.dataset);
 		this.redraw(trees[0]);
 	};
 
@@ -159,6 +153,15 @@ export default class HierarchySVG extends Component {
 		else {
 			//console.log('(leaf) dist:', { L: 0.5, R: 0.5 })
 			return { L: 0.5, R: 0.5 };
+		}
+	};
+
+	followBreadcrumbs({ label, parent }, breadcrumbs = []) {
+		breadcrumbs.push({ text: label });
+		if (parent) {
+			return this.followBreadcrumbs(parent, breadcrumbs);
+		} else {
+			return breadcrumbs.reverse();
 		}
 	};
 
@@ -270,6 +273,8 @@ export default class HierarchySVG extends Component {
 			// circles:
 			elements.circles.push({
 				id: branch.id,
+				label: branch.label,
+				parent: branch.parent,
 				...branch.geometry
 			});
 			// labels:
@@ -330,19 +335,21 @@ export default class HierarchySVG extends Component {
 			.style('stroke', this.SVG.tree.node.borderColor)
 			.style('stroke-width', this.SVG.tree.node.borderWidth)
 			.style('cursor', 'pointer')
-			.on('mouseenter', function() {
+			.on('mouseenter', function(d) {
 				const node = select(this);
 				node
 					.style('stroke-width', self.SVG.tree.node.borderWidth * 2)
 					.style('stroke', '#0FF');
+				self.setState({ breadcrumbs: self.followBreadcrumbs(d) });
 			} )
 			.on('mouseleave', function() {
 				const node = select(this);
 				node
 					.style('stroke-width', self.SVG.tree.node.borderWidth)
 					.style('stroke', self.SVG.tree.node.borderColor);
+				self.setState({ breadcrumbs: [] });
 			} )
-			.on('click', (d) => console.log(d));
+			.on('click', (d) => console.log(d.id));
 		nodes
 			.exit()
 			.remove();
@@ -371,21 +378,30 @@ export default class HierarchySVG extends Component {
 	};
 
 	render() {
-		const styles = {
-			SVG: {
-				backgroundColor: '#FFF',
-				border: 'solid 1px #272B2E'
-			},
-		};
+		const panControlHandler = (direction = 0) => console.log(direction);
 		return (
 			<svg height={this.props.height} width={this.props.width} style={styles.SVG}>
+				<BreadcrumbsSVG maxLength={this.props.width} breadcrumbs={this.state.breadcrumbs} />
 				<defs>
 					<clipPath id="tree-container">
 						<rect x="0" y="0" height={this.SVG.tree.container.height} width={this.SVG.tree.container.width} />
 					</clipPath>
 				</defs>
 				<g ref={this.tree} clipPath="url(#tree-container)"></g> 
+				<g transform={'translate(' + [ this.props.width - 100, this.props.height - 100 ].join(' ') + ')'}>
+					<PanControlSVG size={100} panControlHandler={panControlHandler} />
+				</g>
+				<g transform={'translate(' + [ this.props.width - 36, this.SVG.margin.top ].join(' ') + ')'}>
+					<ZoomControlSVG style={styles.zoom} size={28} zoomControlHandler={panControlHandler} />
+				</g>
 			</svg>
 		);
 	};
+};
+
+const styles = {
+	SVG: {
+		backgroundColor: '#FFF',
+		border: 'solid 1px #272B2E'
+	},
 };

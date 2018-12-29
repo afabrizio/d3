@@ -3,7 +3,7 @@ const themes = [
 	{
 		stroke: '#FFF',
 		fill: '#00000055',
-		text: '#FFF'
+		text: '#000'
 	}
 ];
 
@@ -19,44 +19,71 @@ export default class BreadcrumbsSVG extends Component {
 	};
 
 	crumbFactory(breadcrumbs = []) {
-		// TODO: forEach to reduce. offset is relative to previous length, not current text length!
-		breadcrumbs.forEach( (crumb, i, crumbs) => {
-			const { fill = themes[this.state.theme]['fill'], stroke = themes[this.state.theme]['stroke'], text } = crumb;
-			let offset = {
-				dx: 0,
-				dy: 0
-			};
-			if (i > 0) {
-				offset = {
-					dx: crumbs[i - 1]['offset']['dx'] + (this.state.fontSize * text.length) + (2 * (this.state.margin + this.state.strokeWidth)),
-					dy: crumbs[i - 1]['offset']['dy']
-				};
-				// adjusts offsets for line wrapping:
-				if (offset.dx > (this.props.maxLength || 0)) {
-					offset.dx = 0; 
-					offset.dy += 10 + (2 * (this.state.margin + this.state.strokeWidth));
-				}
-			}
-			crumbs[i] = { fill, offset, stroke, text };
-		} );
-		return (
-			<g className="crumbs" transform={'translate(' + [ this.state.margin, this.state.margin ].join(' ') + ')'}>
-				{breadcrumbs.map( ({ fill, offset, stroke, text }, i) => {
-					const points = [
-						[ 0, 0 ],
-						[ this.state.strokeWidth + this.state.margin + (this.state.fontSize * text.length), 0 ],
-						[ (2 * (this.state.strokeWidth + this.state.margin)) + (this.state.fontSize * text.length), this.state.strokeWidth + this.state.margin + this.state.fontSize / 2 ],
-						[ this.state.strokeWidth + this.state.margin + (this.state.fontSize * text.length), (2 * (this.state.strokeWidth + this.state.margin)) + this.state.fontSize ],
-						[ 0, (2 * (this.state.strokeWidth + this.state.margin)) + this.state.fontSize ],
-						[ this.state.strokeWidth + this.state.margin, this.state.strokeWidth + this.state.margin + this.state.fontSize / 2 ],
-						[ 0, 0 ]
-					]
+		const { fontSize, margin, strokeWidth, theme } = this.state;
+		return ( 
+			<g className="crumbs" transform={'translate(' + [ margin, margin ].join(' ') + ')'}>
+				{breadcrumbs.reduce( (crumbs, crumb, i) => {
+					const { fill = themes[theme]['fill'], text = '' } = crumb;
+					const crumbWidth = (2 * strokeWidth) + (4 * margin) + (fontSize * text.length * 0.8);
+					if (i > 0) {
+						const { x0, dx, y0 } = crumbs[i - 1]; 
+						if (x0 + dx + crumbWidth > this.props.maxLength) {
+							crumbs.push({
+								dx: crumbWidth,
+								fill,
+								text,
+								x0: 2 * margin,
+								y0: y0 + (2 * strokeWidth) + (2 * margin) + fontSize + margin
+							});
+						}
+						else {
+							crumbs.push({
+								dx: crumbWidth,
+								fill,
+								text,
+								x0: x0 + dx,
+								y0
+							});
+						}
+					}
+					else {
+						crumbs.push({
+							dx: crumbWidth,
+							fill,
+							text,
+							x0: 0,
+							y0: 0,
+						});
+					}
+					return crumbs;
+				}, [])
+				.map( ({ dx, fill, text, x0, y0 }, i) => {
+					const points = (x0 === 0 && y0 === 0 ?
+						[
+							[ 0, 0 ],
+							[ strokeWidth + (3 * margin) + (fontSize * text.length * 0.8), 0 ],
+							[ (2 * strokeWidth) + (4 * margin) + (fontSize * text.length * 0.8), strokeWidth + margin + fontSize / 2 ],
+							[ strokeWidth + (3 * margin) + (fontSize * text.length * 0.8), (2 * (strokeWidth + margin)) + fontSize ],
+							[ 0, (2 * (strokeWidth + margin)) + fontSize ],
+							[ 0, 0 ]
+						]
+						:
+						[
+							[ 0, 0 ],
+							[ strokeWidth + (3 * margin) + (fontSize * text.length * 0.8), 0 ],
+							[ (2 * strokeWidth) + (4 * margin) + (fontSize * text.length * 0.8), strokeWidth + margin + fontSize / 2 ],
+							[ strokeWidth + (3 * margin) + (fontSize * text.length * 0.8), (2 * (strokeWidth + margin)) + fontSize ],
+							[ 0, (2 * (strokeWidth + margin)) + fontSize ],
+							[ strokeWidth + margin, strokeWidth + margin + fontSize / 2 ],
+							[ 0, 0 ]
+						]
+						)
 						.map( (d) => d.join(',') )
 						.join(' ');
 					return (
-						<g className="crumb" transform={'translate(' + [ offset.dx, offset.dy ].join(' ') + ')'} key={i}>
-							<polygon points={points} fill={fill} stroke={stroke} strokeWidth={this.state.strokeWidth} />;
-							<text transform={'translate(' + [ this.state.strokeWidth + this.state.margin, this.state.strokeWidth + this.state.margin ].join(' ') + ')'} dy={this.state.fontSize / 2} textAnchor="center" fontSize={this.state.fontSize} stroke={themes[this.state.theme]['text']}>{text}</text>
+						<g className="crumb" transform={'translate(' + [ x0, y0 ].join(' ') + ')'} key={i}>
+							<polygon points={points} fill={fill} stroke={themes[theme].stroke} strokeWidth={strokeWidth} />;
+							<text transform={'translate(' + [ strokeWidth + (2 * margin), strokeWidth + margin ].join(' ') + ')'} dy={fontSize} letterSpacing={fontSize * 0.2} fontSize={fontSize} fontWeight={200} stroke={themes[theme]['text']}>{text}</text>
 						</g>
 					);
 				} )}
@@ -66,7 +93,7 @@ export default class BreadcrumbsSVG extends Component {
 
 	render() {
 		return (
-			<svg id="breadcrumbs" width={this.props.maxLength || 200}>
+			<svg id="breadcrumbs" width={this.props.maxLength || 400}>
 				{this.crumbFactory(this.props.breadcrumbs)}
 			</svg>
 		);
