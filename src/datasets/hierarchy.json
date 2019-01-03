@@ -79,20 +79,44 @@
 				"label": "HSG",
 				"children": [
 					{
-						"id": 5,
-						"label": "USA",
-						"children": [
-						]
-					},
-					{
-						"id": 5,
+						"id": 17,
 						"label": "CAN",
 						"children": [
 						]
 					},
 					{
-						"id": 5,
-						"label": "LON",
+						"id": 18,
+						"label": "ESS",
+						"children": [
+						]
+					},
+					{
+						"id": 19,
+						"label": "NJ",
+						"children": [
+						]
+					},
+					{
+						"id": 20,
+						"label": "LIT",
+						"children": [
+						]
+					},
+					{
+						"id": 21,
+						"label": "PAE",
+						"children": [
+						]
+					},
+					{
+						"id": 22,
+						"label": "SIN",
+						"children": [
+						]
+					},
+					{
+						"id": 23,
+						"label": "UK",
 						"children": [
 						]
 					}
